@@ -1,0 +1,20 @@
+{
+    "user": [
+        {
+            "id_user": 1,
+            "user_type": 1,
+            "username": "Jean",
+            "status": 1,
+            "mail": "abcde@gmail.com",
+            "password": "azerty"
+        },
+        {
+            "id_user": 2,
+            "user_type": 1,
+            "username": "Vincent",
+            "status": 1,
+            "mail": "fghij@outlook.fr",
+            "password": "qsdfgh"
+        }
+    ]
+}
