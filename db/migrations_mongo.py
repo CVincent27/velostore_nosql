@@ -1,43 +1,29 @@
-import database_mongo as dbm
-import os
-import sys
-from faker import Faker
+import json
+from database_mongo import VelostoreDatabaseMongo
 
-fake = Faker()
-num_records = 20
-
-sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]) + "/entities")
-import bike_item_entity as be
-
-#import bike_brand_entity as bbe
-#import order_entity as oe
-#import user_entity as ue
-#import stat_bike_entity as sbe
-#import internal_parameters_entity as ipe
-
-class Migration(dbm.VelostoreDatabaseMongo):
+class Migration(VelostoreDatabaseMongo):
     """Classe pour gérer la migration des données dans la base de données Velostore."""
 
     def __init__(self):
         """Initialise Migration avec les entités nécessaires."""
         super().__init__()
-        self.bike_item_entity = be.BikeItemEntity(self.db)
 
-    def setup(self):
-        """Configure les collections."""
-        self.bike_item_entity.create_collection()
+    def load_json_data(self, file_path):
+        """Charge les données depuis un fichier JSON."""
+        with open(file_path, 'r') as file:
+            return json.load(file)
 
-
-    def add_dynamics_data(self):
-        """Ajoute des données dynamiques aux collections."""
-        self.bike_item_entity.insert_data()
-
+    def insert_data(self, data):
+        """Insère les données dans la base de données."""
+        for collection_name, documents in data.items():
+            collection = self.db[collection_name]
+            collection.insert_many(documents)
 
 def main():
     """Fonction principale pour la classe Migration."""
     initial_setup = Migration()
-    initial_setup.setup()
-    initial_setup.add_dynamics_data()
+    data = initial_setup.load_json_data('data.json')
+    initial_setup.insert_data(data)
 
 if __name__ == "__main__":
     main()
