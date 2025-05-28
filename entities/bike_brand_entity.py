@@ -1,107 +1,101 @@
-import os, sys
-sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]) + "/db")
-import database as db
+import os
+import sys
 
-class BikeBrandEntity(db.VelostoreDatabase):
+# Ajoutez le chemin du module à sys.path
+sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]) + "/../db")
+
+# Importez le module de la base de données
+import mongodb_database as db
+
+class VelostoreDatabase:
+    """Classe de base pour gérer les opérations de base de données."""
+
+    def __init__(self):
+        """Initialise la connexion à la base de données."""
+        self.db = db.client['votre_base_de_donnees'] 
+
+class BikeBrandEntity(VelostoreDatabase):
     """Classe pour gérer les opérations de base de données liées aux marques de vélos."""
+
     def __init__(self):
         """Initialise BikeBrandEntity."""
         super().__init__()
-        
+        self.collection = self.db["Bike"] 
+
     def create_tables(self):
         """Crée les tables nécessaires dans la base de données."""
-        self.create_bike_brand_table()
-        
-    def create_bike_brand_table(self):
-        """Crée la table des marques de vélos."""
-        self.cursor.execute("""
-                        CREATE TABLE IF NOT EXISTS bike_brand (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                            brand STRING NOT NULL UNIQUE,
-                            description STRING NOT NULL,
-                            price INTEGER NOT NULL,
-                            destination STRING NOT NULL,
-                            img STRING,
-                            FOREIGN KEY(destination) REFERENCES bike_destination(id)
-                        )
-                        """)
+        self.create_bike_table()
 
-    
-    # GET BRAND BY ID
-    def get_brand_by_id(self, brand_id: int, expand: bool = True) -> dict:
-        """Récupère une marque de vélo par son identifiant.
+    def create_bike_table(self):
+        """Crée la table des vélos."""
+        # La collection est déjà initialisée dans __init__
+        pass
 
-        Args:
-            brand_id (int): L'identifiant de la marque de vélo.
-            expand (bool, optionnel): Un indicateur pour déterminer si les détails doivent être étendus. Par défaut, True.
+    def create_schema_bike(self):
+        """Définition du schéma pour la collection Bike."""
+        schema = {
+            "bsonType": "object",
+            "properties": {
+                "brand": {
+                    "bsonType": "object",
+                    "properties": {
+                        "Description": {"bsonType": "string"},
+                        "Price": {"bsonType": "int"},
+                        "Image": {"bsonType": "string"},
+                        "Destination": {"bsonType": "string"}
+                    }
+                },
+                "config": {
+                    "bsonType": "object",
+                    "properties": {
+                        "Size": {"bsonType": "string"},
+                        "Color": {"bsonType": "string"}
+                    }
+                },
+                "Status": {"bsonType": "string"}
+            }
+        }
 
-        Returns:
-            dict: Les informations de la marque de vélo correspondante.
-        """
-        if expand:
-            query = """
-                SELECT
-                    bike_brand.id,
-                    bike_brand.brand,
-                    bike_brand.description,
-                    bike_brand.price,
-                    bike_destination.destination as destination,
-                    bike_brand.img
-                FROM bike_brand
-                JOIN bike_destination ON bike_brand.destination = bike_destination.id
-                WHERE bike_brand.id = ?
-            """
+        validator = {"$jsonSchema": schema}
+
+        # Appliquer le schéma
+        self.db.command("collMod", "Bike", validator=validator)
+
+    def create_collection(self):
+        """Crée la collection BikeItem si elle n'existe pas."""
+        if "BikeItem" not in self.db.list_collection_names():
+            self.db.create_collection('BikeItem')
+            print("Collection 'BikeItem' créée.")
         else:
-            query = """
-                SELECT 
-                    * 
-                FROM bike_brand
-                WHERE bike_brand.id = ?
-            """
+            print("La collection 'BikeItem' existe déjà.")
 
-        self.cursor.execute(query, (brand_id,))
-        return super().change_list_to_dict(self.cursor.fetchone())
-    
+    def insert_data_bike(self):
+        """Insère un document de test dans la collection Bike."""
+        bike_data_test = {
+            "brand": {
+                "Description": "Un vélo de montagne robuste",
+                "Price": 500,
+                "Image": "image_url",
+                "Destination": "Montagne"
+            },
+            "config": {
+                "Size": "M",
+                "Color": "Bleu"
+            },
+            "Status": "Disponible"
+        }
 
-    # ADD BRAND (FOR ADMIN)
-    def add_brand(self, brand: int, description: int, price: int, destination_id: int, img: str = None) -> int:
-        """Ajoute une nouvelle marque de vélo.
-
-        Args:
-            brand (str): Le nom de la marque.
-            description (str): La description de la marque.
-            price (int): Le prix de la marque.
-            destination_id (int): L'identifiant de la destination.
-            img (str, optionnel): L'URL de l'image de la marque. Par défaut, None.
-
-        Returns:
-            int: L'identifiant de la nouvelle marque ajoutée.
-        """
-        self.cursor.execute("""
-            INSERT INTO bike_brand (brand, description, price, destination, img)
-            VALUES (?, ?, ?, ?, ?)
-        """, (brand, description, price, destination_id, img))
-        self.connection.commit()
-        return self.cursor.lastrowid
-    
-    
-    # DELETE BRAND (FOR ADMIN)
-    def delete_brand(self, brand_id: int):
-        """Supprime une marque de vélo.
-
-        Args:
-            brand_id (int): L'identifiant de la marque de vélo à supprimer.
-        """
-        self.cursor.execute("DELETE FROM bike_brand WHERE id = ?", (brand_id,))
-        self.connection.commit()
-
-    
+        # Insérer le document dans la collection
+        self.collection.insert_one(bike_data_test)
+        print("Document inséré avec succès.")
 
 def main():
     """Fonction principale pour la classe BikeBrandEntity."""
     super_velo = BikeBrandEntity()
     super_velo.create_tables()
-    
+    super_velo.create_schema_bike()
+    super_velo.create_collection()
+    super_velo.insert_data_bike()
 
 if __name__ == '__main__':
     main()

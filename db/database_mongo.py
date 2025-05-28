@@ -1,8 +1,6 @@
-import pymongo
-from pymongo import MongoClient
+import pymongo 
 
-
-class VelostoreDatabaseMongo():
+class VelostoreDatabase():
     """Classe pour gérer la base de données Velostore."""
 
     def __init__(self):
@@ -10,8 +8,14 @@ class VelostoreDatabaseMongo():
         self.connection_db()
 
     def connection_db(self) -> None:
-        """Crée connexion pour la base de données."""
-        client = MongoClient("mongodb://localhost:27017/")
-        self.db = client["velostore_db"]
+        """Crée une connexion et un objet curseur pour la base de données.
+        """
+        self.myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+        self.mydb = self.myclient["velostore"]
+        
+def main():
+    velostore_db = VelostoreDatabase()
+    velostore_db.connection_db()
 
-velostore_db = VelostoreDatabaseMongo()
+if __name__ == '__main__':
+    main()
