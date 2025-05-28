@@ -11,12 +11,12 @@ schema = {
     "bsonType": "object",
     "required": ["id_order", "id_user", "user", "bikes", "Date", "Total_price", "Status"],
     "properties": {
-        "id_user": {"bsonType": "int"},
+        "id_user": {"bsonType": "string"},
         "user": {
             "bsonType": "object",
             "required": ["id_user", "Username", "Mail"],
             "properties": {
-                "id_user": {"bsonType": "int"},
+                "id_user": {"bsonType": "string"},
                 "Username": {"bsonType": "string"},
                 "Mail": {"bsonType": "string"}
             }
