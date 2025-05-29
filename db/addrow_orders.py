@@ -1,4 +1,6 @@
 from pymongo import MongoClient
+from bson import ObjectId
+from datetime import datetime
 
 # Connexion au serveur MongoDB local
 client = MongoClient("mongodb://localhost:27017/")
@@ -11,49 +13,159 @@ db = client["mangovelodatabase"]
 collection = db["Orders"]
 
 # 2. Insérer plusieurs documents à la fois (INSERT MANY)
-new_user = [
-    {"user_type": "Utilisateur", "username": "jules100", "status": "actif", "mail": "jules@gmail.com","password": "vl4e5swer5@"}
-]
-new_orders = [
-        "id_user": "12",
+sample_orders = [
+    {
+        "_id": ObjectId(),
         "user": {
-                "id_user": {"bsonType": "int"},
-                "Username": {"bsonType": "string"},
-                "Mail": {"bsonType": "string"}
-            },
-        "bikes": {
-            "items": {
-                "properties": {
-                    "brand": {
-                        "properties": {
-                            "Description": {"bsonType": "string"},
-                            "Price": {"bsonType": "int"}
-                        }
-                    },
-                    "config": {
-                        "properties": {
-                            "Size": {"bsonType": "string"},
-                            "Color": {"bsonType": "string"}
-                        }
-                    },
-                    "nb_unit": {"bsonType": "int"},
-                    "price": {"bsonType": "int"}
-                }
-            }
+            "id_user": ObjectId("665612a5cbe5f12c8a4f1234"),
+            "Username": "jules100",
+            "Mail": "jules@gmail.com"
         },
-
-        "Date": "date",
-        "Total_price": 1000,
-        "Status": "Dispo"
+        "bikes": [
+            {
+                "id_bike": ObjectId("665613f1cbe5f12c8a4f1235"),
+                "brand": {
+                    "brand": "Giant",
+                    "Description": "Mountain Bike with suspension",
+                    "Price": 500
+                },
+                "config": {
+                    "Size": "M",
+                    "Color": "Red"
+                },
+                "nb_unit": 1,
+                "price": 500
+            }
+        ],
+        "Date": datetime(2025, 5, 1),
+        "Total_price": 500,
+        "Status": "payé"
+    },
+    {
+        "_id": ObjectId(),
+        "user": {
+            "id_user": ObjectId("665612a5cbe5f12c8a4f1236"),
+            "Username": "emma200",
+            "Mail": "emma200@gmail.com"
+        },
+        "bikes": [
+            {
+                "id_bike": ObjectId("665613f1cbe5f12c8a4f1237"),
+                "brand": {
+                    "brand": "Trek",
+                    "Description": "Road bike for long-distance riding",
+                    "Price": 700
+                },
+                "config": {
+                    "Size": "L",
+                    "Color": "Blue"
+                },
+                "nb_unit": 2,
+                "price": 1400
+            }
+        ],
+        "Date": datetime(2025, 5, 3),
+        "Total_price": 1400,
+        "Status": "livré"
+    },
+    {
+        "_id": ObjectId(),
+        "user": {
+            "id_user": ObjectId("665612a5cbe5f12c8a4f1238"),
+            "Username": "lucas_dev",
+            "Mail": "lucas.dev@mail.com"
+        },
+        "bikes": [
+            {
+                "id_bike": ObjectId("665613f1cbe5f12c8a4f1239"),
+                "brand": {
+                    "brand": "Decathlon",
+                    "Description": "Urban bike for daily commutes",
+                    "Price": 350
+                },
+                "config": {
+                    "Size": "S",
+                    "Color": "Black"
+                },
+                "nb_unit": 1,
+                "price": 350
+            },
+            {
+                "id_bike": ObjectId("665613f1cbe5f12c8a4f1240"),
+                "brand": {
+                    "brand": "Orbea",
+                    "Description": "Electric bike with long battery life",
+                    "Price": 1200
+                },
+                "config": {
+                    "Size": "M",
+                    "Color": "White"
+                },
+                "nb_unit": 1,
+                "price": 1200
+            }
+        ],
+        "Date": datetime(2025, 5, 5),
+        "Total_price": 1550,
+        "Status": "livré"
+    },
+    {
+        "_id": ObjectId(),
+        "user": {
+            "id_user": ObjectId("665612a5cbe5f12c8a4f1239"),
+            "Username": "sophie_x",
+            "Mail": "sophie.x@example.com"
+        },
+        "bikes": [
+            {
+                "id_bike": ObjectId("665613f1cbe5f12c8a4f1241"),
+                "brand": {
+                    "brand": "BMC",
+                    "Description": "Hybrid bike for trails and roads",
+                    "Price": 600
+                },
+                "config": {
+                    "Size": "M",
+                    "Color": "Green"
+                },
+                "nb_unit": 1,
+                "price": 600
+            }
+        ],
+        "Date": datetime(2025, 5, 6),
+        "Total_price": 600,
+        "Status": "payé"
+    },
+    {
+        "_id": ObjectId(),
+        "user": {
+            "id_user": ObjectId("665612a5cbe5f12c8a4f1242"),
+            "Username": "maxime99",
+            "Mail": "maxime99@hotmail.com"
+        },
+        "bikes": [
+            {
+                "id_bike": ObjectId("665613f1cbe5f12c8a4f1243"),
+                "brand": {
+                    "brand": "Scott",
+                    "Description": "Sport BMX bike",
+                    "Price": 450
+                },
+                "config": {
+                    "Size": "S",
+                    "Color": "Yellow"
+                },
+                "nb_unit": 2,
+                "price": 900
+            }
+        ],
+        "Date": datetime(2025, 5, 7),
+        "Total_price": 900,
+        "Status": "en attente"
     }
 ]
 
-result_many = collection.insert_many(new_user)
+
+
+result_many = collection.insert_many(sample_orders)
 print("IDs insérés pour les autres produits :", result_many.inserted_ids)
-
-# # GET BIKE BY BRAND
-# def get_bike_by_brand(brand: int) -> dict:
-#     one_product = collection.find_one({"brand": brand})
-#     return print("Un produit en Electronics :", one_product)
-
-# get_bike_by_brand("Rockrider")

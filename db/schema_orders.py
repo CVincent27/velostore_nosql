@@ -7,16 +7,15 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["mangovelodatabase"]
 
 # 2. Définition du schéma
-schema = {
+order_schema = {
     "bsonType": "object",
-    "required": ["id_order", "id_user", "user", "bikes", "Date", "Total_price", "Status"],
+    "required": ["user", "bikes", "Date", "Total_price", "Status"],
     "properties": {
-        "id_user": {"bsonType": "string"},
         "user": {
             "bsonType": "object",
             "required": ["id_user", "Username", "Mail"],
             "properties": {
-                "id_user": {"bsonType": "string"},
+                "id_user": {"bsonType": "objectId"},
                 "Username": {"bsonType": "string"},
                 "Mail": {"bsonType": "string"}
             }
@@ -25,12 +24,14 @@ schema = {
             "bsonType": "array",
             "items": {
                 "bsonType": "object",
-                "required": ["brand", "config", "nb_unit", "price"],
+                "required": ["id_bike", "brand", "config", "nb_unit", "price"],
                 "properties": {
+                    "id_bike": {"bsonType": "objectId"},
                     "brand": {
                         "bsonType": "object",
-                        "required": ["Description", "Price"],
+                        "required": ["brand", "Description", "Price"],
                         "properties": {
+                            "brand": {"bsonType": "string"},
                             "Description": {"bsonType": "string"},
                             "Price": {"bsonType": "int"}
                         }
@@ -48,14 +49,13 @@ schema = {
                 }
             }
         },
-
         "Date": {"bsonType": "date"},
         "Total_price": {"bsonType": "int"},
         "Status": {"bsonType": "string"}
     }
 }
 
-validator = {"$jsonSchema": schema}
+validator = {"$jsonSchema": order_schema}
 
 # 3. Création de la collection avec validation
 db.create_collection(
@@ -63,4 +63,4 @@ db.create_collection(
     validator=validator
 )
 
-print("Collection 'orders' créée avec validation JSON Schema.")
+print("Collection 'orders2' créée avec validation JSON Schema.")
